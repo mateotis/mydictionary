@@ -52,6 +52,7 @@ string findWordBinary(vector<string> dictV, int low, int high, string word) {
 string prefixSearch(vector<string> dictV, int low, int high, string word, int length) {
 
 	int compCount = 0;
+	int foundCount = 0;
 
 	while(low <= high) {
 		compCount += 1;
@@ -71,6 +72,7 @@ string prefixSearch(vector<string> dictV, int low, int high, string word, int le
 			while(dictV.at(mid).substr(0,length) == word) { // First we find every match before the first finding
 				cout << dictV.at(mid) << endl;
 				mid -= 1;
+				foundCount += 1;
 			}
 
 			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
@@ -78,6 +80,7 @@ string prefixSearch(vector<string> dictV, int low, int high, string word, int le
 			while(dictV.at(mid).substr(0,length) == word) { // Then we find everything after
 				cout << dictV.at(mid) << endl;
 				mid += 1;
+				foundCount += 1;
 			}
 			break; // Essential!
 
@@ -85,6 +88,7 @@ string prefixSearch(vector<string> dictV, int low, int high, string word, int le
 	  }
 
 	cout << "Comparisons performed: " << compCount << endl;
+	cout << "Found entries: " << foundCount << endl;
 	return "Word(s) found!";
 
 }
@@ -120,19 +124,20 @@ int main() {
 		if (word == "quit" or word == "exit") {
 			break;
 		}
+
+		else if (word.find("*") != string::npos) {
+			int length = word.length() - 1; // Ignore the *
+			word = word.substr(0,length); // Also remove it from the string we pass to the function
+			cout << prefixSearch(dictV, 0, dictV.size() - 1, word, length) << endl;
+
+		}
+
+		else {
+			cout << findWordBinary(dictV, 0, dictV.size() - 1, word) << endl;
+		}
 		//cout << findWordLinear(dictV, word) << endl;
 
-		//cout << findWordBinary(dictV, 0, dictV.size() - 1, word) << endl;
-
-		int length = word.length();
-
-		cout << prefixSearch(dictV, 0, dictV.size() - 1, word, length) << endl;
-
 	}
-
-/*  for(int i = 0; i < dictV.size(); i++) {
-	cout << dictV.at(i) << endl;
-  }*/
 
 	return EXIT_SUCCESS;
 }
