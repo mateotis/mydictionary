@@ -1,34 +1,18 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+
 using namespace std;
 
-// Linear search - O(n)
-string findWordLinear(vector<string> dictV, string word) {
-
-	int compCount = 0;
-
-	for(int i = 0; i < dictV.size(); i++) {
-		compCount += 1;
-	if (dictV.at(i) == word) {
-		cout << "Comparisons performed: " << compCount << endl;
-		return "Word found!";
-		}
-	}
-
-  cout << "Comparisons performed: " << compCount << endl;
-  return "Word not found!";
-}
-
 // Binary search - O(logn)
-string findWordBinary(vector<string> dictV, int low, int high, string word) {
+void fullwordSearch(vector<string> dictV, int low, int high, string word) {
 
 	int compCount = 0;
 
 	while(low <= high) {
 		compCount += 1;
 	
-		int mid=(low + high) / 2; // Median
+		int mid=(low + high) / 2; // We start with the middle element
 		
 		if(dictV.at(mid) < word) {
 			low = mid + 1; // Element is in the right (larger) subarray, ignore everything smaller than the median
@@ -40,16 +24,17 @@ string findWordBinary(vector<string> dictV, int low, int high, string word) {
 
 		//string returnMsg = "Word found at index " + mid + "\n";
 		cout << "Comparisons performed: " << compCount << endl;
-		return "Word found!";
+		cout << "Word found!" << endl;
+		return;
 		}
 	  }
 
   cout << "Comparisons performed: " << compCount << endl;
-  return "Word not found!";
+  cout << "Word not found!" << endl;
 
 }
 
-string prefixSearch(vector<string> dictV, int low, int high, string word, int length) {
+void prefixSearch(vector<string> dictV, int low, int high, string word, int length) {
 
 	int compCount = 0;
 	int foundCount = 0;
@@ -57,13 +42,13 @@ string prefixSearch(vector<string> dictV, int low, int high, string word, int le
 	while(low <= high) {
 		compCount += 1;
 		
-		int mid = (low + high) / 2; // Median
+		int mid = (low + high) / 2;
 		
 		if(dictV.at(mid).substr(0,length) < word) {
-			low = mid + 1; // Element is in the right (larger) subarray, ignore everything smaller than the median
+			low = mid + 1;
 		}
 		else if(dictV.at(mid).substr(0,length) > word) {
-			high = mid - 1; // Element is in the left (smaller) subarray, ignore everything larger than the median
+			high = mid - 1;
 		}
 		else {
 			int originalMid = mid; // Store the first finding for two-way search
@@ -87,9 +72,56 @@ string prefixSearch(vector<string> dictV, int low, int high, string word, int le
 		}
 	  }
 
+	cout << "Comparisons performed until first match: " << compCount << endl;
+	cout << "Found entries: " << foundCount << endl;
+
+}
+
+string wildcardSearch(vector<string> dictV, int low, int high, string word, int length, string::size_type qPos) {
+
+	int compCount = 0;
+	int foundCount = 0;
+
+	while(low <= high) {
+		compCount += 1;
+		
+		int mid = (low + high) / 2; // We start with the middle element
+		
+		if(dictV.at(mid).substr(0,qPos) < word.substr(0,qPos)) { // The first half of a wildcard search is just a prefix search until the ?
+			low = mid + 1;
+		}
+		else if(dictV.at(mid).substr(0,qPos) > word.substr(0,qPos)) {
+			high = mid - 1;
+		}
+		else {
+			int originalMid = mid; // Store the first finding for two-way search
+			int entryLength = dictV.at(mid).length(); // To avoid confusion with the input word's length
+
+			// Just like we did during prefix search, we will go through every element that matches our word up to the ?
+			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) {
+				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) { // But we only display those that also match the part AFTER the ?
+					cout << dictV.at(mid) << endl;
+					foundCount += 1;
+				}
+				mid -= 1;
+			}
+
+			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
+
+			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) { // Ditto
+				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) {
+					cout << dictV.at(mid) << endl;
+					foundCount += 1;
+				}
+				mid += 1;
+			}
+			break; // Essential!
+
+		}
+	  }
+
 	cout << "Comparisons performed: " << compCount << endl;
 	cout << "Found entries: " << foundCount << endl;
-	return "Word(s) found!";
 
 }
 
@@ -121,22 +153,23 @@ int main() {
 	while(true) {
 		cout << "Enter a string: ";
 		cin >> word;
+		string::size_type qPos = word.find("?"); // Check if there is a question mark in the string (and where it is), for wildcard potential
+
 		if (word == "quit" or word == "exit") {
 			break;
 		}
-
-		else if (word.find("*") != string::npos) {
+		else if (word.find("*") != string::npos) { // Prefix
 			int length = word.length() - 1; // Ignore the *
 			word = word.substr(0,length); // Also remove it from the string we pass to the function
-			cout << prefixSearch(dictV, 0, dictV.size() - 1, word, length) << endl;
+			prefixSearch(dictV, 0, dictV.size() - 1, word, length);
 
 		}
-
-		else {
-			cout << findWordBinary(dictV, 0, dictV.size() - 1, word) << endl;
+		else if (qPos != string::npos) { // Wildcard
+			wildcardSearch(dictV, 0,  dictV.size() - 1, word, word.length(), qPos);
 		}
-		//cout << findWordLinear(dictV, word) << endl;
-
+		else { // Full word
+			fullwordSearch(dictV, 0, dictV.size() - 1, word);
+		}
 	}
 
 	return EXIT_SUCCESS;
