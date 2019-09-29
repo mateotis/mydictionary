@@ -34,10 +34,11 @@ void fullwordSearch(vector<string> dictV, int low, int high, string word) {
 
 }
 
-void prefixSearch(vector<string> dictV, int low, int high, string word, int length) {
+void prefixSearch(vector<string> dictV, int low, int high, string word, int length, int maxOutput) {
 
 	int compCount = 0;
 	int foundCount = 0;
+	int outputCount = 0;
 
 	while(low <= high) {
 		compCount += 1;
@@ -55,17 +56,24 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 
 			// Since the dictionary is sorted, all words starting with the prefix are next to each other, we just need to figure out how many are there
 			while(dictV.at(mid).substr(0,length) == word) { // First we find every match before the first finding
-				cout << dictV.at(mid) << endl;
 				mid -= 1;
 				foundCount += 1;
+				outputCount += 1; // We increment outputCount before the check to make sure we don't get one extra output
+				if (outputCount <= maxOutput) {
+					cout << dictV.at(mid) << endl;
+				}
+				
 			}
 
 			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
 
 			while(dictV.at(mid).substr(0,length) == word) { // Then we find everything after
-				cout << dictV.at(mid) << endl;
 				mid += 1;
 				foundCount += 1;
+				outputCount += 1;
+				if (outputCount <= maxOutput) {
+					cout << dictV.at(mid) << endl;
+				}
 			}
 			break; // Essential!
 
@@ -77,10 +85,11 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 
 }
 
-string wildcardSearch(vector<string> dictV, int low, int high, string word, int length, string::size_type qPos) {
+string wildcardSearch(vector<string> dictV, int low, int high, string word, int length, string::size_type qPos, int maxOutput) {
 
 	int compCount = 0;
 	int foundCount = 0;
+	int outputCount = 0;
 
 	while(low <= high) {
 		compCount += 1;
@@ -100,8 +109,11 @@ string wildcardSearch(vector<string> dictV, int low, int high, string word, int 
 			// Just like we did during prefix search, we will go through every element that matches our word up to the ?
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) {
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) { // But we only display those that also match the part AFTER the ?
-					cout << dictV.at(mid) << endl;
 					foundCount += 1;
+					outputCount += 1;
+					if (outputCount <= maxOutput) {
+						cout << dictV.at(mid) << endl;
+					}
 				}
 				mid -= 1;
 			}
@@ -110,8 +122,11 @@ string wildcardSearch(vector<string> dictV, int low, int high, string word, int 
 
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) { // Ditto
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) {
-					cout << dictV.at(mid) << endl;
 					foundCount += 1;
+					outputCount += 1;
+					if (outputCount <= maxOutput) {
+						cout << dictV.at(mid) << endl;
+					}
 				}
 				mid += 1;
 			}
@@ -126,11 +141,28 @@ string wildcardSearch(vector<string> dictV, int low, int high, string word, int 
 }
 
 
-int main() {
+int main(int argc, char* args[]) {
+
+	string dictName;
+	int maxOutput;
+
+	for(int i = 0; i < argc; i++) {
+		string str(args[i]);
+		if (str == "-d") {
+			cout << args[i+1] << endl;
+			string dictNameStr(args[i+1]);
+			dictName = dictNameStr;
+		}
+
+		if (str == "-l") {
+			string maxOutputStr(args[i+1]); // Hack, replace if possible!
+			maxOutput = stoi(maxOutputStr);
+		}
+	}
 
 	vector<string> dictV;
 
-	ifstream fin("Dictionary2.txt");
+	ifstream fin(dictName);
 
 	if (fin.is_open()) {
 
@@ -161,11 +193,11 @@ int main() {
 		else if (word.find("*") != string::npos) { // Prefix
 			int length = word.length() - 1; // Ignore the *
 			word = word.substr(0,length); // Also remove it from the string we pass to the function
-			prefixSearch(dictV, 0, dictV.size() - 1, word, length);
+			prefixSearch(dictV, 0, dictV.size() - 1, word, length, maxOutput);
 
 		}
 		else if (qPos != string::npos) { // Wildcard
-			wildcardSearch(dictV, 0,  dictV.size() - 1, word, word.length(), qPos);
+			wildcardSearch(dictV, 0,  dictV.size() - 1, word, word.length(), qPos, maxOutput);
 		}
 		else { // Full word
 			fullwordSearch(dictV, 0, dictV.size() - 1, word);
