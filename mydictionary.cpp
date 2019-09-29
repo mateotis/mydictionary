@@ -56,24 +56,24 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 
 			// Since the dictionary is sorted, all words starting with the prefix are next to each other, we just need to figure out how many are there
 			while(dictV.at(mid).substr(0,length) == word) { // First we find every match before the first finding
-				mid -= 1;
 				foundCount += 1;
 				outputCount += 1; // We increment outputCount before the check to make sure we don't get one extra output
 				if (outputCount <= maxOutput) {
 					cout << dictV.at(mid) << endl;
 				}
+				mid -= 1;
 				
 			}
 
 			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
 
 			while(dictV.at(mid).substr(0,length) == word) { // Then we find everything after
-				mid += 1;
 				foundCount += 1;
 				outputCount += 1;
 				if (outputCount <= maxOutput) {
 					cout << dictV.at(mid) << endl;
 				}
+				mid += 1;
 			}
 			break; // Essential!
 
