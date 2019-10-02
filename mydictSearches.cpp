@@ -4,7 +4,6 @@
 
 using namespace std;
 
-// Binary search - O(logn)
 void fullwordSearch(vector<string> dictV, int low, int high, string word) {
 
 	int compCount = 0;
@@ -75,7 +74,7 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 				}
 				mid += 1;
 			}
-			break; // Essential!
+			break; // Essential! Infinite loop otherwise
 
 		}
 	  }
@@ -94,7 +93,7 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 	while(low <= high) {
 		compCount += 1;
 		
-		int mid = (low + high) / 2; // We start with the middle element
+		int mid = (low + high) / 2;
 		
 		if(dictV.at(mid).substr(0,qPos) < word.substr(0,qPos)) { // The first half of a wildcard search is just a prefix search until the ?
 			low = mid + 1;
@@ -103,7 +102,7 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 			high = mid - 1;
 		}
 		else {
-			int originalMid = mid; // Store the first finding for two-way search
+			int originalMid = mid;
 			int entryLength = dictV.at(mid).length(); // To avoid confusion with the input word's length
 
 			// Just like we did during prefix search, we will go through every element that matches our word up to the ?
@@ -118,7 +117,7 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 				mid -= 1;
 			}
 
-			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
+			mid = originalMid + 1;
 
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) { // Ditto
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) {
@@ -129,13 +128,14 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 					}
 				}
 				mid += 1;
+				compCount += 1; // Incrementing comparison count since we are asked for the time to return all the answers
 			}
-			break; // Essential!
+			break;
 
 		}
 	  }
 
-	cout << "Comparisons performed: " << compCount << endl;
+	cout << "Comparisons performed to return every answer: " << compCount << endl;
 	cout << "Found entries: " << foundCount << endl;
 
 }

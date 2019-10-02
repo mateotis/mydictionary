@@ -8,13 +8,12 @@ using namespace std;
 int main(int argc, char* args[]) {
 
 	string dictName;
-	int maxOutput;
+	int maxOutput = 0;
 
 	for(int i = 0; i < argc; i++) {
 		string str(args[i]);
 		if (str == "-d") {
-			cout << args[i+1] << endl;
-			string dictNameStr(args[i+1]);
+			string dictNameStr(args[i+1]); // The parameter after -d is the dictionary name
 			dictName = dictNameStr;
 		}
 
@@ -29,9 +28,7 @@ int main(int argc, char* args[]) {
 	ifstream fin(dictName);
 
 	if (fin.is_open()) {
-
 		string var;
-
 		while(fin) {
 			fin >> var;
 			dictV.push_back(var); // Stores dictionary in vector
@@ -42,7 +39,7 @@ int main(int argc, char* args[]) {
 	}
 
 	fin.close();
-
+	
 
 	string word;
 
