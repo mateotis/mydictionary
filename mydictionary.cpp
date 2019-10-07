@@ -14,16 +14,16 @@ int main(int argc, char* args[]) {
 		string str(args[i]);
 		if (str == "-d") {
 			string dictNameStr(args[i+1]); // The parameter after -d is the dictionary name
-			dictName = dictNameStr;
+			dictName = dictNameStr; // Since dictNameStr is only valid within the loop
 		}
 
 		if (str == "-l") {
-			string maxOutputStr(args[i+1]); // Hack, replace if possible!
+			string maxOutputStr(args[i+1]); // Same for the max output
 			maxOutput = stoi(maxOutputStr);
 		}
 	}
 
-	vector<string> dictV;
+	vector<string> dictV; // Defining our data structure
 
 	ifstream fin(dictName);
 
@@ -40,15 +40,15 @@ int main(int argc, char* args[]) {
 
 	fin.close();
 	
-
+	// Ready to process input!
 	string word;
 
 	while(true) {
 		cout << "Enter a string: ";
 		cin >> word;
-		string::size_type qPos = word.find("?"); // Check if there is a question mark in the string (and where it is), for wildcard potential
+		int qPos = word.find("?"); // Check if there is a question mark in the string (and store where it is), for wildcard potential
 
-		if (word == "quit" or word == "exit") {
+		if (word == "exit") {
 			break;
 		}
 		else if (word.find("*") != string::npos) { // Prefix

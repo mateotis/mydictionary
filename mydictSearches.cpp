@@ -8,20 +8,20 @@ void fullwordSearch(vector<string> dictV, int low, int high, string word) {
 
 	int compCount = 0;
 
-	while(low <= high) {
+	// Binary search - since dictionaries are in alphabetical order, we can consider them sorted arrays, which is the condition for binary search
+	while(low <= high) { // Runs until it can't divide the dictionary anymore
 		compCount += 1;
 	
-		int mid=(low + high) / 2; // We start with the middle element
+		int mid = (low + high) / 2; // We start with the middle element
 		
 		if(dictV.at(mid) < word) {
-			low = mid + 1; // Element is in the right (larger) subarray, ignore everything smaller than the median
+			low = mid + 1; // Element is in the right (larger) subarray, ignore everything smaller than the middle
 		}
 		else if(dictV.at(mid) > word) {
-			high = mid - 1; // Element is in the left (smaller) subarray, ignore everything larger than the median
+			high = mid - 1; // Element is in the left (smaller) subarray, ignore everything larger than the middle
 		}
 		else {
 
-		//string returnMsg = "Word found at index " + mid + "\n";
 		cout << "Comparisons performed: " << compCount << endl;
 		cout << "Word found!" << endl;
 		return;
@@ -60,7 +60,7 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 				if (outputCount <= maxOutput) {
 					cout << dictV.at(mid) << endl;
 				}
-				mid -= 1;
+				mid -= 1; // Move to the element just before the current one
 				
 			}
 
@@ -84,7 +84,7 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 
 }
 
-void wildcardSearch(vector<string> dictV, int low, int high, string word, int length, string::size_type qPos, int maxOutput) {
+void wildcardSearch(vector<string> dictV, int low, int high, string word, int length, int qPos, int maxOutput) {
 
 	int compCount = 0;
 	int foundCount = 0;
@@ -107,6 +107,12 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 
 			// Just like we did during prefix search, we will go through every element that matches our word up to the ?
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) {
+				compCount += 1; // Incrementing comparison count since we are asked for the time to return all the answers
+				
+				while(qPos >= dictV.at(mid).length()) {	// Skip over entries with length less than the ?'s position, else we get out-of-range errors at the next comparison			
+					mid -= 1;
+				}
+
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) { // But we only display those that also match the part AFTER the ?
 					foundCount += 1;
 					outputCount += 1;
@@ -120,6 +126,12 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 			mid = originalMid + 1;
 
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) { // Ditto
+				compCount += 1;
+				
+				while(qPos >= dictV.at(mid).length()) {					
+					mid += 1;
+				}
+
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) {
 					foundCount += 1;
 					outputCount += 1;
@@ -128,7 +140,6 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 					}
 				}
 				mid += 1;
-				compCount += 1; // Incrementing comparison count since we are asked for the time to return all the answers
 			}
 			break;
 
