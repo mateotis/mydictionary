@@ -37,9 +37,8 @@ int main(int argc, char* args[]) {
 			}
 		}
 	}
-
 	fin.close();
-	
+
 	// Ready to process input!
 	string word;
 

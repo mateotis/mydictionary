@@ -61,10 +61,12 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 					cout << dictV.at(mid) << endl;
 				}
 				mid -= 1; // Move to the element just before the current one
+				if(mid < 0) { break; } // The first of many boundary-checks; this needs to be checked every time mid is changed to make sure the search stops at the start/end of the dictionary
 				
 			}
 
 			mid = originalMid + 1; // Return to the first finding plus one to avoid repeating it
+			if(mid >= dictV.size()) { break; }
 
 			while(dictV.at(mid).substr(0,length) == word) { // Then we find everything after
 				foundCount += 1;
@@ -73,6 +75,7 @@ void prefixSearch(vector<string> dictV, int low, int high, string word, int leng
 					cout << dictV.at(mid) << endl;
 				}
 				mid += 1;
+				if(mid >= dictV.size()) { break; } // When you iterate forward and go beyond the last index, stop
 			}
 			break; // Essential! Infinite loop otherwise
 
@@ -103,15 +106,16 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 		}
 		else {
 			int originalMid = mid;
-			int entryLength = dictV.at(mid).length(); // To avoid confusion with the input word's length
 
 			// Just like we did during prefix search, we will go through every element that matches our word up to the ?
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) {
 				compCount += 1; // Incrementing comparison count since we are asked for the time to return all the answers
-				
 				while(qPos >= dictV.at(mid).length()) {	// Skip over entries with length less than the ?'s position, else we get out-of-range errors at the next comparison			
 					mid -= 1;
 				}
+				if(mid < 0) { break; } // When you iterate backward and go beyond the first index, stop
+
+				int entryLength = dictV.at(mid).length(); // To avoid confusion with the input word's length
 
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) { // But we only display those that also match the part AFTER the ?
 					foundCount += 1;
@@ -121,16 +125,19 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 					}
 				}
 				mid -= 1;
+				if(mid < 0) { break; }
 			}
-
+			
 			mid = originalMid + 1;
+			if(mid >= dictV.size()) { break; }
 
 			while(dictV.at(mid).substr(0,qPos) == word.substr(0,qPos)) { // Ditto
 				compCount += 1;
-				
 				while(qPos >= dictV.at(mid).length()) {					
 					mid += 1;
 				}
+				if(mid >= dictV.size()) { break; }
+				int entryLength = dictV.at(mid).length();
 
 				if (dictV.at(mid).substr(qPos + 1,entryLength - qPos) == word.substr(qPos + 1,length - qPos)) {
 					foundCount += 1;
@@ -140,6 +147,7 @@ void wildcardSearch(vector<string> dictV, int low, int high, string word, int le
 					}
 				}
 				mid += 1;
+				if(mid >= dictV.size()) { break; }
 			}
 			break;
 
